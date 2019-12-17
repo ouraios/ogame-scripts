@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    3.16
+// @version    4.0.0
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
 // @include https://*.ogame.gameforge.com/game/index.php?page=combatreport*
-// @updateURL https://openuserjs.org/install/Ouraios/Expe-3000.user.js
-// @downloadURL https://openuserjs.org/install/Ouraios/Expe-3000.user.js
+// @updateURL https://github.com/ouraios/ogame-scripts/EXPE-3000/raw/master/expe-3000/expe-3000.user.js
+// @downloadURL https://github.com/ouraios/ogame-scripts/raw/master/expe-3000/expe-3000.user.js
 // @date       11 octobre 2012
 // @author     Nitneuc and Quanxing and Ouraios -- Libre d'être modifié ou reproduit, tant que cette ligne @author reste complète
 // @grant none
@@ -19,7 +19,7 @@
 	**************************
 	Expédition-3000:
 	----------------
-	https://openuserjs.org/scripts/Ouraios/Expe-3000
+	https://github.com/ouraios/ogame-scripts/EXPE-3000/raw/master/expe-3000/expe-3000.user.js
 	compatible : Firefox & Google chrome
 
 	Variables persistantes stockées:
@@ -974,6 +974,7 @@
                     }
                 }
             })
+        // TODO : Fixer l'intégration des pertes sur les combats contre aliens & pirates
         } else if (false) {
             if (messageType === 'combatReport') { // Si page courante n'est pas 'RC détaillé', 2 possibilités
                 var message_enCours = recuperer_enTete_message(2);
@@ -1339,7 +1340,7 @@
         boutonBBCode_url: "http://imageshack.us/a/img821/7079/boutonbbcode.png",
         boutonUserScripts_lien: "http://userscripts.org/scripts/show/150500",
         boutonForum_lien: "http://board.ogame.fr/board1474-ogame-le-jeu/board641-les-cr-ations-ogamiennes/board642-logiciels-tableurs/1061937-exp-3000-compteur-d-exp-dition-autonome/",
-        boutonMAJ_lien: "https://openuserjs.org/install/Ouraios/Expe-3000.user.js",
+        boutonMAJ_lien: "https://github.com/ouraios/ogame-scripts/EXPE-3000/raw/master/expe-3000/expe-3000.user.js",
         bouton_width: 27,
     };
     // ********************
@@ -1348,7 +1349,7 @@
 
     // test si 1ère exécution / MAJ <v2 / MAJ <  var version_courante / MAJ
     var ordonnerListePosition = false; // passera a true si il y a besoin d'ordonner la liste (au changement de version)
-    if (location.href != "https://openuserjs.org/scripts/Ouraios/Expe-3000") {
+    if (location.href != "https://github.com/ouraios/ogame-scripts/EXPE-3000/raw/master/expe-3000/expe-3000.user.js") {
 
         if (localStorage.getObj(scriptKeyLocalStorage + "_premiereExecution") != false) initialiserDonneesUtilisateur();
         else {
@@ -1365,7 +1366,7 @@
     }
     creer_CSS();
 
-    if (location.href == "https://openuserjs.org/scripts/Ouraios/Expe-3000") {
+    if (location.href == "https://github.com/ouraios/ogame-scripts/EXPE-3000/raw/master/expe-3000/expe-3000.user.js") {
         (verifier_MAJ(document)) ? affichage_alerte("Mise-à-jour disponible", document.getElementById("summary"), "compteurExpe_alerteAtt") : affichage_alerte("Script à jour", document.getElementById("summary"), "compteurExpe_alerteOK");
     }
 
