@@ -305,7 +305,7 @@
             var fixe = new Array(4, 16, texte.titre_h2_flotte, new Array(texte.titre_h3_flotte_vaisseau, texte.titre_h3_flotte_gain, texte.titre_h3_flotte_perte, texte.titre_h3_flotte_solde));
             fixe[4] = new Array();
             for (var i = 0; i < vaisseau.length; i++) fixe[4][i] = vaisseau[i][0];
-            fixe[4][13] = texte.titre_hLigne_flotte_ressources;
+            fixe[4][15] = texte.titre_hLigne_flotte_ressources;
         }
         if (numTableau == 3) { // Tableau 'Ressources'
             var fixe = new Array(2, 6, texte.titre_h2_ressources, new Array(texte.titre_h3_ressources_ressource, texte.titre_h3_ressources_quantite));
@@ -719,8 +719,8 @@
         this.resultat = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         this.am_gain = 0;
         this.ress_gain = new Array(0, 0, 0);
-        this.vaiss_gain = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        this.vaiss_perte = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        this.vaiss_gain = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        this.vaiss_perte = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         this.ress_vaiss_perte = 0;
         this.item = new Array(new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0));
         this.ress_item_gain = new Array(0, 0, 0);
@@ -777,13 +777,13 @@
         if (type == 1) { // partie inférieure des tableaux
             compteur_v2.rapport_flotte = new Array(new Array(), new Array(), new Array());
             compteur_v2.rapport_flotte[0] = [...compteur_v2.vaiss_gain];
-            compteur_v2.rapport_flotte[0][6] = compteur_v2.rapport_flotte[0][7] = compteur_v2.rapport_flotte[0][11] = compteur_v2.rapport_flotte[0][13] = ""; // VC+Rcy+EDLM effacés
+            compteur_v2.rapport_flotte[0][6] = compteur_v2.rapport_flotte[0][7] = compteur_v2.rapport_flotte[0][11] = compteur_v2.rapport_flotte[0][15] = ""; // VC+Rcy+EDLM effacés
             compteur_v2.rapport_flotte[1] = [...compteur_v2.vaiss_perte];
-            compteur_v2.rapport_flotte[1][13] = compteur_v2.ress_vaiss_perte;
+            compteur_v2.rapport_flotte[1][15] = compteur_v2.ress_vaiss_perte;
             var tableTmp = new Array();
             for (var tmp = 0; tmp < compteur_v2.vaiss_gain.length; tmp++) tableTmp[tmp] = compteur_v2.vaiss_gain[tmp] - compteur_v2.vaiss_perte[tmp]; // retrait du prototype soustractionTables après signalement d'un bug
             compteur_v2.rapport_flotte[2] = tableTmp;
-            compteur_v2.rapport_flotte[2][13] = (compteur_v2.ress_vaiss_perte * -1);
+            compteur_v2.rapport_flotte[2][15] = (compteur_v2.ress_vaiss_perte * -1);
 
             compteur_v2.rapport_item = new Array(new Array(), new Array(), new Array());
             for (var tmp = 0; tmp < compteur_v2.item.length; tmp++)
@@ -847,7 +847,7 @@
         var rnd_1 = recuperer_info_round(rc[0]);
         var rnd_n = recuperer_info_round(rc[rc.length - 1]);
         if ((rnd_1 == -1) || (rnd_n == -1)) return -1;
-        var rnd_orga = new Array(new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        var rnd_orga = new Array(new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
         for (var i = 0; i < rnd_1.length; i++) {
             for (var j = 0; j < vaisseau.length; j++) {
