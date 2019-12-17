@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.0.0
+// @version    4.0.1
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -685,7 +685,7 @@
                 if (contenu_texte.indexOf(param_resultat[i][j]) != -1) this.resultat = param_resultat[i][0]; // recherche du type d'expédition par les mots clefs du message
 
         if (this.resultat == param_resultat[6][0]) {
-            this.vaiss_gain = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // recherche de vaisseaux gagnés
+            this.vaiss_gain = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // recherche de vaisseaux gagnés
             for (var i = 0; i < vaisseau.length; i++)
                 if (contenu_texte.indexOf(vaisseau[i][0]) != -1) this.vaiss_gain[i] = parseInt(contenu_texte.match(new RegExp(vaisseau[i][0] + ': (\\d+)'))[1]);
         }
@@ -694,7 +694,7 @@
             for (var i = 0; i <= ressource.length; i++)
                 if (contenu_texte.indexOf(ressource[i]) != -1) this.ress_gain[i] = parseInt(contenu_texte.match(new RegExp(ressource[i] + ' ([\\d.]+)'))[1].replace(/\./g, ''));
         }
-        if (this.resultat == param_resultat[8][0]) this.am_gain = parseInt(contenu_texte.motSuivant(texte.am, "<").replace(reg_nonNum, ""));
+        if (this.resultat == param_resultat[8][0]) this.am_gain = parseInt(contenu_texte.match(new RegExp('\\(AM\\) ([\\d.]+)'))[1].replace(/\./g, ''));
 
         if (this.resultat == param_resultat[10][0]) {
             this.item = new Array(new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0), new Array(0, 0, 0));
@@ -1093,7 +1093,23 @@
     let scriptKeyLocalStorage = scriptID;
 
     if (langue == "fr") {
-        var vaisseau = new Array(new Array("Petit transporteur", "P.TRANSP."), new Array("Grand transporteur", "G.TRANSP."), new Array("Chasseur léger", "CH.LÉGER"), new Array("Chasseur lourd", "CH.LOURD"), new Array("Croiseur", "CROISEUR"), new Array("Vaisseau de bataille", "V.BATAILLE"), new Array("Vaisseau de colonisation", "V.COLO"), new Array("Recycleur", "RECYCLEUR"), new Array("Sonde d`espionnage", "SONDE"), new Array("Bombardier", "BOMBARDIER"), new Array("Destructeur", "DESTR."), new Array("Etoile de la mort", "RIP"), new Array("Traqueur", "TRAQUEUR"));
+        var vaisseau = new Array(
+            new Array("Petit transporteur", "P.TRANSP."),
+            new Array("Grand transporteur", "G.TRANSP."),
+            new Array("Chasseur léger", "CH.LÉGER"),
+            new Array("Chasseur lourd", "CH.LOURD"),
+            new Array("Croiseur", "CROISEUR"),
+            new Array("Vaisseau de bataille", "V.BATAILLE"),
+            new Array("Vaisseau de colonisation", "V.COLO"),
+            new Array("Recycleur", "RECYCLEUR"),
+            new Array("Sonde d`espionnage", "SONDE"),
+            new Array("Bombardier", "BOMBARDIER"),
+            new Array("Destructeur", "DESTR."),
+            new Array("Etoile de la mort", "RIP"),
+            new Array("Traqueur", "TRAQUEUR"),
+            new Array('Éclaireur', 'ECLAIREUR'),
+            new Array('Faucheur', 'FAUCHEUR')
+        );
 
         var param_resultat = new Array( // phrases des messages d'expéditions ; la première case de chaque type de résultat est réservée à la nomination du résultat ;  la 2ème à la nomination telle qu'elle sera affichée" ; la 3ème à la couleur d'affichage dans le graphique
             new Array("aucun", "Aucun", "votre flotte fera demi-tour", "sans résultat aucun", "l`expédition a dû être interrompue", "ne ramène rien de spécial", "a découvert... le vide", "C`est d`ailleurs la seule info recueillie", "aucune information vraiment passionnante", "aucun résultat intéressant", "plusieurs musées de la planète-mère", "revient les mains et les soutes vides", "Peut-être saurons nous", "revient donc sans aucun résultat", "ne nous a pas apporté grand chose", "a contracté une espèce de paludisme qui a envoyé une bonne partie de l`équipage à l`infirmerie"),
