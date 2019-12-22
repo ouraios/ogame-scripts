@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.0.3
+// @version    4.0.4
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -100,12 +100,6 @@
 
     function arraySomme(array) {
         return array.reduce((acc, val) => acc + val, 0)
-    }
-
-    function arraMultiDimensionalSum(array) {
-        return array.reduce((acc, val) => {
-            return acc + val.reduce((acc, val) => acc + val)
-        }, 0)
     }
 
     function arrayAdditionTables(table1, table2) {
@@ -242,22 +236,23 @@
         return (((new Date()).getTime()) - (dateFormatOgame2date(dateInit).getTime())) / 86400000;
     }
 
-    function position2nombre(pos) { // transforme une position de système solaire type x:y en entier
-        return parseInt(pos.split(".")[0]) * 1000 + parseInt(pos.split(".")[1]);
-    }
-
     // ***********************************
     // ****** Fonctions d'affichage ******
     // ***********************************
 
-    function afficher_formRExp() {
-        var elHTML = document.getElementsByClassName("showmessage")[0];
+    function afficher_formRExp(messageElement) {
+        var elHTML = messageElement;
         var inner = elHTML.innerHTML;
         var ajoutHTML = '<div id="trouNoirParam" class="compteurExpe_tdPadding" align="center"><table class="compteurExpe_table2 compteurExpe_option"><tr><td>' + texte.trouNoir + '</td></tr>';
         for (var i = 0; i < vaisseau.length; i++) ajoutHTML += '<tr><td>' + vaisseau[i][0] + '</td><td><input type="text" id="trouNoir_vaiss' + i + '" value="0" size="4"/></td></tr>';
         ajoutHTML += '<tr><td align="center"><input type="button" id="boutonValider_trouNoir" value="' + texte.boutonValider_trouNoir + '"/></td></tr></table></div>';
         elHTML.innerHTML = inner + ajoutHTML;
-        ecouteBouton_trouNoir();
+
+        messageElement.querySelector("#boutonValider_trouNoir").addEventListener("click", function () {
+            for (var tmp = 0; tmp < compteur_v2.vaiss_perte.length; tmp++) compteur_v2.vaiss_perte[tmp] += parseInt(messageElement.querySelector("#trouNoir_vaiss" + tmp).value);
+            effacerContenu("trouNoirParam");
+            affichage_alerte(texte.alerte_trouNoirParam, messageElement, "compteurExpe_alerteOK");
+        }, false);
     }
 
     function creer_CSS() { // ajoute des classes CSS
@@ -328,28 +323,11 @@
         elHTML.innerHTML = ajHTML + inHTML;
     }
 
-    function afficherAlerte_message(messagesElementContainer) { // affiche les alertes sur les entrées page 'messages'
-        var mail = messagesElementContainer.querySelectorAll('.msg');
-        console.log(messagesElementContainer);
-        console.log(messagesElementContainer.querySelectorAll('.msg'));
-        if (mess_pageCourante == mail[0].getAttribute("id")) return; // si on a pas changé de page, retour
-        mess_pageCourante = mail[0].getAttribute("id");
-        for (var i = 0; i < mail.length; i++) {
-            var titreEntree = mail[i].querySelector('.msg_title').innerHTML;
-            var dateEntree = mail[i].querySelector('.msg_date').innerHTML;
-            //affichage_alerte(titreEntree,document.getElementById("boxBG"),"compteurExpe_alerteAtt");
-            if (((titreEntree.indexOf(texte.rapport_expe) != -1) && (elementExiste(liste_message_v2, dateEntree, "[1]") == -1)) ||
-                ((titreEntree.indexOf(texte.rapport_combat) != -1) && (titreEntree.indexOf(":16]") != -1) && (elementExiste(liste_message_RC, dateEntree, ".date") != -1))) {
-                affichage_alerte(texte.alerte_nonSauve, mail[i].querySelector('.msg_date'), "compteurExpe_alerteError"); // (l'entrée du message lue par le script est un rapport d'expédition ET qu'il n'est pas dans la liste sauvegardée) OU ( il est un RC d'expé ET ce RC d'expé est en attente de lecture)
-            }
-        }
-    }
-
     function afficherTable() {
         compteur_v22tableaux(0);
         var elHTML = document.getElementById("middle");
         var inner = elHTML.innerHTML;
-        var ajoutHTML = '<div align="center"><table class="compteurExpe_table1">' +
+        var ajoutHTML = '<div id="compteur-expe-dashboard"><div align="center"><table class="compteurExpe_table1">' +
             '<tr><td valign="top" class="compteurExpe_tdPadding">' +
             '<table width="100%"><tr><td>' +
             ecrireTableau(creer_partieFixeTableaux(1), compteur_v2.rapport_resultat, new Array(11, -1)) +
@@ -359,12 +337,20 @@
             '</td></tr><tr><td class="compteurExpe_tdPadding">' +
             ecrireTableau(creer_partieFixeTableaux(4), compteur_v2.rapport_points, new Array(2, -1)) +
             '</td></tr></table></td></tr></table></td></tr>' +
-            '<tr><td id="compteurExpe_titre" class="compteurExpe_tdPadding"><table class="compteurExpe_table2"><tr><td colspan=2><table><tr><td id="boutonSpoiler" class="compteurExpe_bouton" valign="middle"><img title="' + texte.boutonSpoiler_title + '" src="' + config.boutonSpoiler_url + '"/></td>' +
+            '<tr><td id="compteurExpe_titre" class="compteurExpe_tdPadding"><table class="compteurExpe_table2"><tr><td colspan=2><table><tr><td id="boutonSpoiler" class="compteurExpe_bouton" valign="middle">'+
+            `<svg title="${texte.boutonSpoiler_title}" style="height: 20px;width: 20px;cursor: pointer;" aria-hidden="true" focusable="false" data-prefix="fad" data-icon="sort-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="svg-inline--fa fa-sort-down fa-w-10 fa-7x"><g class="fa-group"><path fill="currentColor" d="M279.07 224.05h-238c-21.4 0-32.1-25.9-17-41l119-119a23.9 23.9 0 0 1 33.8-.1l.1.1 119.1 119c15.07 15.05 4.4 41-17 41z" class="fa-secondary" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path><path fill="currentColor" d="M296.07 329.05L177 448.05a23.9 23.9 0 0 1-33.8.1l-.1-.1-119-119c-15.1-15.1-4.4-41 17-41h238c21.37 0 32.04 25.95 16.97 41z" class="fa-primary" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></g></svg>` + '</td>' +
             '<td class="compteurExpe_header1" width="' + (recuperer_CSSOgame_width() - 2 * config.bouton_width - 100) + 'px">' + texte.titre_h1_rapport + '<td class="compteurExpe_dateInit" width="100px">' + texte.version + ' ' + version_courante + '</td></td>' +
-            '<td id="boutonOption" class="compteurExpe_bouton" valign="middle"><img title="' + texte.boutonOption_title + '" src="' + config.boutonOption_url + '"/></td></tr></table></td></tr>' +
+            '<td id="boutonOption" class="compteurExpe_bouton" valign="middle">'+
+            `
+            <svg style="height: 20px;width: 20px;cursor: pointer;" title="${texte.boutonOption_title}" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="tools" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-tools fa-w-16 fa-3x">
+                <path fill="currentColor" d="M501.1 395.7L384 278.6c-23.1-23.1-57.6-27.6-85.4-13.9L192 158.1V96L64 0 0 64l96 128h62.1l106.6 106.6c-13.6 27.8-9.2 62.3 13.9 85.4l117.1 117.1c14.6 14.6 38.2 14.6 52.7 0l52.7-52.7c14.5-14.6 14.5-38.2 0-52.7zM331.7 225c28.3 0 54.9 11 74.9 31l19.4 19.4c15.8-6.9 30.8-16.5 43.8-29.5 37.1-37.1 49.7-89.3 37.9-136.7-2.2-9-13.5-12.1-20.1-5.5l-74.4 74.4-67.9-11.3L334 98.9l74.4-74.4c6.6-6.6 3.4-17.9-5.7-20.2-47.4-11.7-99.6.9-136.6 37.9-28.5 28.5-41.9 66.1-41.2 103.6l82.1 82.1c8.1-1.9 16.5-2.9 24.7-2.9zm-103.9 82l-56.7-56.7L18.7 402.8c-25 25-25 65.5 0 90.5s65.5 25 90.5 0l123.6-123.6c-7.6-19.9-9.9-41.6-5-62.7zM64 472c-13.2 0-24-10.8-24-24 0-13.3 10.7-24 24-24s24 10.7 24 24c0 13.2-10.7 24-24 24z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;">                
+                </path>
+            </svg>
+            `
+            +'</td></tr></table></td></tr>' +
             '<tr><td class="compteurExpe_dateInit" width="' + (100 - config.console_width) + '%">' + texte.titre_h1_sousTitre + dateInit + '</td>' +
             '<td id="compteurExpe_console" style="background-color:' + config.console_bgColor + '" class="compteurExpe_console" width="' + config.console_width + '%">' + texte.console_base + '</td>' +
-            '</tr></table></td></tr></table></div><div id="espace_contenuSpoiler"></div>';
+            '</tr></table></td></tr></table></div><div id="espace_contenuSpoiler"></div></div>';
         elHTML.innerHTML = inner + ajoutHTML;
         (config_user.spoilerDefault) ? afficherTable_secondaire() : ecouteBouton_option();
     }
@@ -461,8 +447,7 @@
     }
 
     function afficherOption() {
-        var elHTML_3 = document.getElementById("middle");
-        var inner_3 = elHTML_3.innerHTML;
+        var elHTML_3 = document.querySelector('#compteur-expe-dashboard');
         var ajoutHTML_3 = '<div id="optionScript" class="compteurExpe_tdPadding" align="center"><table class="compteurExpe_table2 compteurExpe_option"><tr><td>' + texte.option_nbDec + '</td><td><input type="text" id="option_nbDec" size="2" maxlength="1" value="' + config_user.nbDec + '"/></td></tr>' +
             '<tr><td>' + texte.option_delaiActualisation + '</td><td><input type="text" id="option_delaiActualisation" value="' + config_user.delaiActualisation + '"/></td></tr>' +
             '<tr><td>' + texte.option_spoilerDefault + '</td><td><input type="radio" value="true" name="option_spoilerDefault" id="option_spoilerDefault_aff"/><label for="option_spoilerDefault_aff">' + texte.option_spoilerDefault_aff + '</label>' +
@@ -476,13 +461,12 @@
             '<input type="radio" value="m" name="option_uniteRaccourci_seuil" id="option_uniteRaccourci_seuil_m"/><label for="option_uniteRaccourci_seuil_m">' + texte.option_uniteRaccourci_seuil_m + '</label>' +
             '<input type="radio" value="g" name="option_uniteRaccourci_seuil" id="option_uniteRaccourci_seuil_g"/><label for="option_uniteRaccourci_seuil_g">' + texte.option_uniteRaccourci_seuil_g + '</label>	</td></tr>' +
             '<tr><td align="center"><input type="button" id="boutonValider" value="' + texte.boutonValider + '"/></td></tr>' +
-            '<tr><td>' + texte.boutonBBCode_title + '</td><td id="boutonBBCode" class="compteurExpe_bouton" valign="middle"><img title="' + texte.boutonBBCode_title + '" src="' + config.boutonBBCode_url + '"/></td></tr>' +
-            '<tr><td>' + texte.boutonForum_title + '</td><td class="compteurExpe_bouton" valign="middle"><a href="' + config.boutonForum_lien + '" target="_blank"><img title="' + texte.boutonForum_title + '" src="' + config.boutonForum_url + '"/></a></td></tr>' +
-            '<tr><td>' + texte.boutonUserScripts_title + '</td><td class="compteurExpe_bouton" valign="middle"><a href="' + config.boutonUserScripts_lien + '" target="_blank"><img title="' + texte.boutonUserScripts_title + '" src="' + config.boutonUserScripts_url + '"/></a></td></tr>' +
-            '<tr><td>' + texte.boutonMAJ_title + '</td><td class="compteurExpe_bouton" valign="middle"><a href="' + config.boutonMAJ_lien + '"><img title="' + texte.boutonMAJ_title + '" src="' + config.boutonMAJ_url + '"/></a></td></tr>' +
-            '<tr><td>' + texte.boutonDefault_title + '</td><td id="boutonDefault" class="compteurExpe_bouton" valign="middle"><img title="' + texte.boutonDefault_title + '" src="' + config.boutonDefault_url + '"/></td></tr>' +
-            '<tr><td>' + texte.boutonInstall_title + '</td><td id="boutonInstall" class="compteurExpe_bouton" valign="middle"><img title="' + texte.boutonInstall_title + '" src="' + config.boutonInstall_url + '"/></td></tr></table></div>';
-        elHTML_3.innerHTML = inner_3 + ajoutHTML_3;
+            '<tr><td>' + texte.boutonBBCode_title + '</td><td id="boutonBBCode" class="compteurExpe_bouton" valign="middle"><svg style="height: 20px;width: 20px;cursor: pointer;" title="' + texte.boutonBBCode_title + '" aria-hidden="true" focusable="false" data-prefix="far" data-icon="code" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-code fa-w-18 fa-3x"><path fill="currentColor" d="M234.8 511.7L196 500.4c-4.2-1.2-6.7-5.7-5.5-9.9L331.3 5.8c1.2-4.2 5.7-6.7 9.9-5.5L380 11.6c4.2 1.2 6.7 5.7 5.5 9.9L244.7 506.2c-1.2 4.3-5.6 6.7-9.9 5.5zm-83.2-121.1l27.2-29c3.1-3.3 2.8-8.5-.5-11.5L72.2 256l106.1-94.1c3.4-3 3.6-8.2.5-11.5l-27.2-29c-3-3.2-8.1-3.4-11.3-.4L2.5 250.2c-3.4 3.2-3.4 8.5 0 11.7L140.3 391c3.2 3 8.2 2.8 11.3-.4zm284.1.4l137.7-129.1c3.4-3.2 3.4-8.5 0-11.7L435.7 121c-3.2-3-8.3-2.9-11.3.4l-27.2 29c-3.1 3.3-2.8 8.5.5 11.5L503.8 256l-106.1 94.1c-3.4 3-3.6 8.2-.5 11.5l27.2 29c3.1 3.2 8.1 3.4 11.3.4z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></svg></td></tr>' +
+            '<tr><td>' + texte.boutonForum_title + '</td><td class="compteurExpe_bouton" valign="middle"><a href="' + config.boutonForum_lien + '" target="_blank"><svg style="height: 20px;width: 20px;cursor: pointer;" title="' + texte.boutonForum_title + '" aria-hidden="true" focusable="false" data-prefix="far" data-icon="external-link" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-external-link fa-w-16 fa-7x"><path fill="currentColor" d="M497.6,0,334.4.17A14.4,14.4,0,0,0,320,14.57V47.88a14.4,14.4,0,0,0,14.69,14.4l73.63-2.72,2.06,2.06L131.52,340.49a12,12,0,0,0,0,17l23,23a12,12,0,0,0,17,0L450.38,101.62l2.06,2.06-2.72,73.63A14.4,14.4,0,0,0,464.12,192h33.31a14.4,14.4,0,0,0,14.4-14.4L512,14.4A14.4,14.4,0,0,0,497.6,0ZM432,288H416a16,16,0,0,0-16,16V458a6,6,0,0,1-6,6H54a6,6,0,0,1-6-6V118a6,6,0,0,1,6-6H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V304A16,16,0,0,0,432,288Z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></svg></a></td></tr>' +
+            '<tr><td>' + texte.boutonMAJ_title + '</td><td class="compteurExpe_bouton" valign="middle"><a href="' + config.boutonMAJ_lien + '"><svg style="height: 20px;width: 20px;cursor: pointer;" title="' + texte.boutonMAJ_title + '" aria-hidden="true" focusable="false" data-prefix="far" data-icon="sync-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-sync-alt fa-w-16 fa-7x"><path fill="currentColor" d="M483.515 28.485L431.35 80.65C386.475 35.767 324.485 8 256 8 123.228 8 14.824 112.338 8.31 243.493 7.971 250.311 13.475 256 20.301 256h28.045c6.353 0 11.613-4.952 11.973-11.294C66.161 141.649 151.453 60 256 60c54.163 0 103.157 21.923 138.614 57.386l-54.128 54.129c-7.56 7.56-2.206 20.485 8.485 20.485H492c6.627 0 12-5.373 12-12V36.971c0-10.691-12.926-16.045-20.485-8.486zM491.699 256h-28.045c-6.353 0-11.613 4.952-11.973 11.294C445.839 370.351 360.547 452 256 452c-54.163 0-103.157-21.923-138.614-57.386l54.128-54.129c7.56-7.56 2.206-20.485-8.485-20.485H20c-6.627 0-12 5.373-12 12v143.029c0 10.691 12.926 16.045 20.485 8.485L80.65 431.35C125.525 476.233 187.516 504 256 504c132.773 0 241.176-104.338 247.69-235.493.339-6.818-5.165-12.507-11.991-12.507z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></svg></a></td></tr>' +
+            '<tr><td>' + texte.boutonDefault_title + '</td><td id="boutonDefault" class="compteurExpe_bouton" valign="middle"><svg style="height: 20px;width: 20px;cursor: pointer;" title="' + texte.boutonDefault_title + '" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-trash-alt fa-w-14 fa-3x"><path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></svg></td></tr>' +
+            '<tr><td>' + texte.boutonInstall_title + '</td><td id="boutonInstall" class="compteurExpe_bouton" valign="middle"><svg style="height: 20px;width: 20px;cursor: pointer;" title="' + texte.boutonInstall_title + '" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-trash-alt fa-w-14 fa-3x"><path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></svg></td></tr></table></div>';
+        elHTML_3.insertAdjacentHTML( 'beforeend', ajoutHTML_3 );
         // checked par défaut
         (config_user.spoilerDefault) ? document.getElementById("option_spoilerDefault_aff").setAttribute("checked", "checked") : document.getElementById("option_spoilerDefault_mas").setAttribute("checked", "checked");
         (config_user.itemVisible) ? document.getElementById("option_itemVisible_aff").setAttribute("checked", "checked") : document.getElementById("option_itemVisible_mas").setAttribute("checked", "checked");
@@ -492,7 +476,7 @@
     }
 
     function afficher_BBCode() {
-        var elHTML_4 = document.getElementById("middle");
+        var elHTML_4 = document.querySelector('#compteur-expe-dashboard');
         var inner_4 = elHTML_4.innerHTML;
         var ajoutHTML_4 = '<div id="BBCode" class="compteurExpe_tdPadding" align="center"><table width="100%" class="compteurExpe_table2 compteurExpe_option compteurExpe_tdPadding"><tr><td>' + texte.option_BBCode + '<br><textarea name="BBCode" cols="' + config.option_BBCode_textArea_w + '" rows="' + config.option_BBCode_textArea_h + '">' + ecrireBBCode() + '</textarea></td></tr>' +
             '<tr><td><table width="100%"><tr><td>' + texte.option_BBCode_titre + '</td>' +
@@ -505,12 +489,12 @@
             '<td><input type="radio" value="mas" name="option_BBCode_perso_place" id="option_BBCode_perso_place_mas"/><label for="option_BBCode_perso_place_mas">' + texte.option_BBCode_perso_place_mas + '</label></td></tr></table></td></tr>' +
             '<tr><td align="center"><input type="button" id="boutonValider_BBCode" value="' + texte.boutonValider_BBCode + '"/></td></tr>' +
             '</table></div>';
-        elHTML_4.innerHTML = inner_4 + ajoutHTML_4;
+        elHTML_4.insertAdjacentHTML( 'beforeend', ajoutHTML_4 );
         // checked par défaut
-        if (config_user.option_BBCode_titre_pseudo) document.getElementById("option_BBCode_titre_pseudo").setAttribute("checked");
-        if (config_user.option_BBCode_titre_uni) document.getElementById("option_BBCode_titre_uni").setAttribute("checked");
-        if (config_user.option_BBCode_titre_langue) document.getElementById("option_BBCode_titre_langue").setAttribute("checked");
-        document.getElementById("option_BBCode_perso_place_" + config_user.option_BBCode_perso_place).setAttribute("checked");
+        if (config_user.option_BBCode_titre_pseudo) document.getElementById("option_BBCode_titre_pseudo").checked = true;
+        if (config_user.option_BBCode_titre_uni) document.getElementById("option_BBCode_titre_uni").checked = true;
+        if (config_user.option_BBCode_titre_langue) document.getElementById("option_BBCode_titre_langue").checked = true;
+        document.getElementById("option_BBCode_perso_place_" + config_user.option_BBCode_perso_place).checked = true;
         ecouteBouton_option();
     }
 
@@ -553,14 +537,6 @@
         }, false);
         if (document.getElementById("boutonBBCode")) document.getElementById("boutonBBCode").addEventListener("click", function () {
             (document.getElementById("BBCode")) ? effacerContenu("BBCode") : afficher_BBCode();
-        }, false);
-    }
-
-    function ecouteBouton_trouNoir() {
-        document.getElementById("boutonValider_trouNoir").addEventListener("click", function () {
-            for (var tmp = 0; tmp < compteur_v2.vaiss_perte.length; tmp++) compteur_v2.vaiss_perte[tmp] += parseInt(document.getElementById("trouNoir_vaiss" + tmp).value);
-            effacerContenu("trouNoirParam");
-            affichage_alerte(texte.alerte_trouNoirParam, document.getElementsByClassName("showmessage")[0], "compteurExpe_alerteOK");
         }, false);
     }
 
@@ -768,7 +744,7 @@
 
             compteur_v2.rapport_points = new Array(new Array(), new Array());
             compteur_v2.rapport_points[0][0] = ressource2point(arraySomme(compteur_v2.ress_gain));
-            compteur_v2.rapport_points[0][1] = ressource2point(arraMultiDimensionalSum(coutListeVaisseau(compteur_v2.vaiss_gain, vaisseau_cout)) - arraMultiDimensionalSum(coutListeVaisseau(compteur_v2.vaiss_perte, vaisseau_cout)) - compteur_v2.ress_vaiss_perte);
+            compteur_v2.rapport_points[0][1] = ressource2point(sumCoutListeVaisseau(compteur_v2.vaiss_gain) - sumCoutListeVaisseau(compteur_v2.vaiss_perte));
             compteur_v2.rapport_points[0][2] = compteur_v2.rapport_points[0][0] + compteur_v2.rapport_points[0][1];
             compteur_v2.rapport_points[1][0] = (100 * compteur_v2.rapport_points[0][0] / compteur_v2.rapport_points[0][2]).arrondi_decimal(config_user.nbDec);
             compteur_v2.rapport_points[1][1] = (100 * compteur_v2.rapport_points[0][1] / compteur_v2.rapport_points[0][2]).arrondi_decimal(config_user.nbDec);
@@ -778,12 +754,13 @@
             compteur_v2.rapport_flotte = new Array(new Array(), new Array(), new Array());
             compteur_v2.rapport_flotte[0] = [...compteur_v2.vaiss_gain];
             compteur_v2.rapport_flotte[0][6] = compteur_v2.rapport_flotte[0][7] = compteur_v2.rapport_flotte[0][11] = compteur_v2.rapport_flotte[0][15] = ""; // VC+Rcy+EDLM effacés
+            compteur_v2.rapport_flotte[0][15] = sumCoutListeVaisseau(compteur_v2.vaiss_gain);
             compteur_v2.rapport_flotte[1] = [...compteur_v2.vaiss_perte];
-            compteur_v2.rapport_flotte[1][15] = compteur_v2.ress_vaiss_perte;
+            compteur_v2.rapport_flotte[1][15] = sumCoutListeVaisseau(compteur_v2.vaiss_perte);
             var tableTmp = new Array();
             for (var tmp = 0; tmp < compteur_v2.vaiss_gain.length; tmp++) tableTmp[tmp] = compteur_v2.vaiss_gain[tmp] - compteur_v2.vaiss_perte[tmp]; // retrait du prototype soustractionTables après signalement d'un bug
             compteur_v2.rapport_flotte[2] = tableTmp;
-            compteur_v2.rapport_flotte[2][15] = (compteur_v2.ress_vaiss_perte * -1);
+            compteur_v2.rapport_flotte[2][15] = compteur_v2.rapport_flotte[0][15] - compteur_v2.rapport_flotte[1][15];
 
             compteur_v2.rapport_item = new Array(new Array(), new Array(), new Array());
             for (var tmp = 0; tmp < compteur_v2.item.length; tmp++)
@@ -797,7 +774,7 @@
             var negNulPos = new Array(0, 0, 0);
             for (var tmp = 0; tmp < res.length; tmp++) negNulPos[param_resultat_negNulPos[tmp] + 1] += res[tmp];
             compteur_v2.rapport_divers[0] = negNulPos;
-            compteur_v2.rapport_divers[1] = arrayPercentage(negNulPos, arraySomme(compteur_v2.ress_gain), config_user.nbDec);
+            compteur_v2.rapport_divers[1] = arrayPercentage(negNulPos, arraySomme(negNulPos), config_user.nbDec);
             compteur_v2.rapport_divers[0][3] = (compteur_v2.rapport_points[0][2] / arraySomme(compteur_v2.resultat)).arrondi_decimal(0).ajoutSeparateurMilliers(config.separateurMilliers) + texte.parExpe;
             compteur_v2.rapport_divers[1][3] = "";
             compteur_v2.rapport_divers[0][4] = zone_epuisee;
@@ -827,10 +804,6 @@
         return dateTmp;
     }
 
-    function recuperer_enTete_message(rubrique) {
-        return document.getElementsByClassName("showmessage")[0].getElementsByClassName("infohead")[0].getElementsByTagName("tr")[rubrique].getElementsByTagName("td")[0].innerHTML;
-    }
-
     function recuperer_info_round(rnd) {
         var table_rnd = rnd.getElementsByClassName("round_defender textCenter")[0].getElementsByClassName("newBack")[0].getElementsByTagName("table")[0];
         if (typeof table_rnd == "undefined") return -1;
@@ -843,41 +816,13 @@
         return vaiss_rnd;
     }
 
-    function recuperer_perte_rcDetaille(rc) { // entrée: table des codes HTML de chacun des rounds, sortie: table de la perte de chaque vaisseau
-        var rnd_1 = recuperer_info_round(rc[0]);
-        var rnd_n = recuperer_info_round(rc[rc.length - 1]);
-        if ((rnd_1 == -1) || (rnd_n == -1)) return -1;
-        var rnd_orga = new Array(new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-
-        for (var i = 0; i < rnd_1.length; i++) {
-            for (var j = 0; j < vaisseau.length; j++) {
-                if (rnd_1[i][0] == vaisseau[j][1]) rnd_orga[0][j] = rnd_1[i][1];
-                if ((typeof rnd_n[i] != "undefined") && (rnd_n[i][0] == vaisseau[j][1])) rnd_orga[1][j] = rnd_n[i][1]; // la double condition est pour le cas où la table rnd_n serait plus petite que la table rnd_1, càd qu'un type entier de vaisseau aurait été détruit
-            }
-        }
-        var rnd_perte = new Array();
-        for (var i = 0; i < rnd_orga[0].length; i++) rnd_perte[i] = rnd_orga[0][i] - rnd_orga[1][i];
-        return rnd_perte;
-    }
-
     function recuperer_infoCompte() { // renvoie une table de 4 cases (pseudo, uni, langue, idPseudoJeu)
         var varJeu = new Array();
-        if (location.href.indexOf("page=combatreport") == -1) { // Si la page est n'importe quelle page
-            varJeu[0] = document.getElementsByName("ogame-player-name")[0].getAttribute("content");
-            varJeu[1] = document.getElementsByName("ogame-universe")[0].getAttribute("content").split(".")[0].replace("uni", "");
-            varJeu[2] = document.getElementsByName("ogame-language")[0].getAttribute("content");
-            varJeu[3] = document.getElementsByName("ogame-player-id")[0].getAttribute("content");
-        } else { // Si la page est le RC détaillé en mode fenêtre (si option activée)
-            varJeu[0] = recuperer_pseudoDefenseur();
-            varJeu[1] = location.href.split("/game/")[0].split(".ogame.")[0].split("uni")[1];
-            varJeu[2] = location.href.split("/game/")[0].split(".ogame.")[1];
-            varJeu[3] = -1; // Sur une page 'RC détaillé', on ne peut pas connaître l'id du joueur
-        }
+        varJeu[0] = document.getElementsByName("ogame-player-name")[0].getAttribute("content");
+        varJeu[1] = document.getElementsByName("ogame-universe")[0].getAttribute("content").split(".")[0].replace("uni", "");
+        varJeu[2] = document.getElementsByName("ogame-language")[0].getAttribute("content");
+        varJeu[3] = document.getElementsByName("ogame-player-id")[0].getAttribute("content");
         return varJeu;
-    }
-
-    function recuperer_pseudoDefenseur() { // renvoie le pseudo du joueur récupéré dans le RC détaillé courant
-        return document.getElementsByClassName("combatreport")[0].getElementsByClassName("combat_round")[0].getElementsByClassName("round_defender textCenter")[0].getElementsByClassName("name textBeefy")[0].innerHTML.split("<figure")[0].split("Défenseur")[1].replace(/ /g, "");
     }
 
     // ******************************
@@ -935,25 +880,21 @@
             if (dateFormatOgame2date(liste_message_RC[i].date).getTime() < dateMax.getTime()) liste_message_RC.splice(i, 1);
     }
 
-    function coutListeVaisseau(table, prixBase) { // prixBase est une liste de prix (M,C,D)
-        var coutTmp = new Array();
-        for (var tmp = 0; tmp < prixBase.length; tmp++) {
-            coutTmp[tmp] = new Array;
-            for (var tmp_2 = 0; tmp_2 < 3; tmp_2++) coutTmp[tmp][tmp_2] = table[tmp] * prixBase[tmp][tmp_2];
+    function sumCoutListeVaisseau(listeVaisseau) { // prixBase est une liste de prix (M,C,D)
+        let totalRessource = 0;
+        for (let i = 0; i < listeVaisseau.length; i++) {
+            totalRessource += (vaisseau_cout[i][0] + vaisseau_cout[i][1] + vaisseau_cout[i][2]) * listeVaisseau[i];
         }
-        return coutTmp;
+        return totalRessource;
     }
 
-    function parcours_message(messagesElementContainer, messageType) { // fonction 'colonne vertébrale'
+    async function parcours_message(messagesElementContainer, messageType) { // fonction 'colonne vertébrale'
+        let promisesCRProcess = [];
         if (messageType === 'expedition') { // Soit page courante = 'Rapport d'expé'
             let messages = messagesElementContainer.querySelectorAll('li.msg');
             messages.forEach(message => {
                 var mesg = new messageExpe(message);
                 if (typeof mesg.resultat == "undefined") { // si aucun résultat n'est enregistré
-                    if (document.getElementById("nonReconnu") != null) { // si cet id est reconnu, c'est que l'alerte est déjà affichée, donc on l'efface pour en afficher une nouvelle ensuite
-                        var alerte_nonReconnu = document.getElementById("nonReconnu");
-                        alerte_nonReconnu.parentNode.removeChild(alerte_nonReconnu);
-                    }
                     affichage_alerte(texte.alerte_messageNonReconnu, message, "compteurExpe_alerteError", "nonReconnu");
                 } else {
                     if (elementExiste(liste_message_v2, mesg.id, "[0]") == -1) {
@@ -970,46 +911,67 @@
                         }
                         if (mesg.mess_sonde == 99) affichage_alerte(texte.alerte_messSondeNonReconnu, message, "compteurExpe_alerteError");
                         affichage_alerte(texte.alerte_rExpeAjoute, message, "compteurExpe_alerteOK");
-                        if (mesg.resultat == "trouNoir") afficher_formRExp();
+                        if (mesg.resultat == "trouNoir") afficher_formRExp(message);
                     }
                 }
             })
         // TODO : Fixer l'intégration des pertes sur les combats contre aliens & pirates
-        } else if (false) {
-            if (messageType === 'combatReport') { // Si page courante n'est pas 'RC détaillé', 2 possibilités
-                var message_enCours = recuperer_enTete_message(2);
-                if (message_enCours.indexOf(texte.rapport_combat) != -1) {
-                    var expeCorrespondante_v2 = elementExiste(liste_message_RC, recuperer_enTete_message(3), ".date"); // c'est le numéro qu'occupe l'objet 'messageExpe_RC' dans 'liste_message_RC'
-                    // SI le RC n'est pas sans combat (flotte descendue au 1er tour)
-                    if ((expeCorrespondante_v2 != -1) &&
-                        (document.getElementsByClassName("showmessage")[0].getElementsByClassName("note")[0].innerHTML.indexOf(texte.RC_contactPerdu) == -1) &&
-                        (typeof liste_message_RC[expeCorrespondante_v2].ress_vaiss_perte == "undefined")) {
-                        liste_message_RC[expeCorrespondante_v2].ress_vaiss_perte = parseInt(document.getElementById("shortreport").getElementsByTagName("tr")[1].getElementsByTagName("td")[4].innerHTML.replace(reg_nonNum, ""));
-                        compteur_v2.ress_vaiss_perte = compteur_v2.ress_vaiss_perte + liste_message_RC[expeCorrespondante_v2].ress_vaiss_perte; // Incrémentation du compteur
-                        if (liste_message_RC[expeCorrespondante_v2].ress_vaiss_perte == 0) { // si il n'y a pas de perte de vaisseaux
-                            liste_message_RC.splice(expeCorrespondante_v2, 1); // Le compteur est incrémenté & la consultation du RC détaillé est inutile, on supprime donc l'objet 'message_RC'
-                            issue_combat[0]++;
-                            affichage_alerte(texte.alerte_rcDetailleInutile, document.getElementsByClassName("showmessage")[0], "compteurExpe_alerteError");
-                            // précédemment affiché: 'document.getElementsByClassName("textCenter next")[0]'
-                        } else issue_combat[1]++;
-                        affichage_alerte(texte.alerte_rcSimpleAjoute, document.getElementsByClassName("showmessage")[0], "compteurExpe_alerteOK");
+        } else if (messageType === 'combatReport') {
+            let messages = messagesElementContainer.querySelectorAll('li.msg');
+            for(let i = 0; i < messages.length; i++){
+                let message = messages[i];
+                let messageDate  = message.querySelector('.msg_date').textContent;
+                let messageID = message.dataset.msgId;
+                let isExpeditionCombatReport = message.querySelector('.msg_title').textContent.includes(':16]');
+                let expeCorrespondante_v2 = liste_message_RC.findIndex(element => element.date === messageDate); // c'est l'index du message d'expédition lié au RC de l'expédition
+                // SI le RC n'est pas sans combat (flotte descendue au 1er tour)
+                if (isExpeditionCombatReport && expeCorrespondante_v2 != -1 && typeof liste_message_RC[expeCorrespondante_v2].ress_vaiss_perte == "undefined") {
+
+                    let vaisseauIDToIndex= {
+                        202: 0,
+                        203: 1,
+                        204: 2,
+                        205: 3,
+                        206: 4,
+                        207: 5,
+                        208: 6,
+                        209: 7,
+                        210: 8,
+                        211: 9,
+                        213: 10,
+                        214: 11,
+                        215: 12,
+                        219: 13,
+                        218: 14,
                     }
-                }
-            } else { // Si page courante = 'RC détaillé'
-                var round = document.getElementsByClassName("master")[0].getElementsByClassName("combat_round");
-                var expeCorrespondante_v2 = elementExiste(liste_message_RC, round[0].getElementsByClassName("start")[0].innerHTML.split("(")[1].split(")")[0], ".date");
-                if (expeCorrespondante_v2 != -1) {
-                    var vaiss_perte = recuperer_perte_rcDetaille(round);
-                    if ((vaiss_perte != -1) && (typeof liste_message_RC[expeCorrespondante_v2].vaiss_perte == "undefined")) {
-                        compteur_v2.ress_vaiss_perte = compteur_v2.ress_vaiss_perte - liste_message_RC[expeCorrespondante_v2].ress_vaiss_perte; // Soustraction des données du RC simple, du compteur
-                        compteur_v2.vaiss_perte = compteur_v2.vaiss_perte.additionTables(vaiss_perte); // Incrémentation du compteur
-                        liste_message_RC.splice(expeCorrespondante_v2, 1); // On supprime l'objet 'messageExpe_RC' de la liste
-                        affichage_alerte(texte.alerte_rcDetailleAjoute, document.getElementsByClassName("combatreport")[0], "compteurExpe_alerteOK");
+                    let perteVaisseau = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+                    let combatReport = await fetch('/game/index.php?page=messages&messageId='+messageID+'&tabid=21&ajax=1').then(data => data.text() ).then(data => {
+                        return JSON.parse(data.match(/var combatData = jQuery.parseJSON\('(.+)'\);/)[1])
+                    });
+                    let combatRounds = combatReport.defenderJSON.combatRounds;
+                    let lossesPerShipID = Object.values(combatRounds[combatRounds.length-1].losses)[0];
+                    let lostShipsResources = 0;
+                    for(let shipID in lossesPerShipID){
+                        perteVaisseau[vaisseauIDToIndex[shipID]] += parseInt(lossesPerShipID[shipID]);
                     }
+                    lostShipsResources = sumCoutListeVaisseau(perteVaisseau);
+
+                    if (lostShipsResources == 0) { // si il n'y a pas de perte de vaisseaux
+                        issue_combat[0]++;
+                    } else{
+                        issue_combat[1]++;
+                        compteur_v2.vaiss_perte = arrayAdditionTables(compteur_v2.vaiss_perte, perteVaisseau); // Incrémentation du compteur
+                    }
+                    liste_message_RC.splice(expeCorrespondante_v2, 1); // On supprime le RC de la liste des RCs à traiter
+                    affichage_alerte(texte.alerte_rcSimpleAjoute, message, "compteurExpe_alerteOK");
                 }
             }
         }
-        // Sauvegarde de variables persistantes en fin de tour
+        savePeristentVariable();
+    }
+
+    function savePeristentVariable(){
         localStorage.setObj(scriptKeyLocalStorage + "_liste_message_v2", liste_message_v2);
         localStorage.setObj(scriptKeyLocalStorage + "_compteur", compteur_v2);
         localStorage.setObj(scriptKeyLocalStorage + "_liste_message_RC", liste_message_RC);
@@ -1270,7 +1232,22 @@
     }
     var param_resultat_color = new Array("0033FF", "9999CC", "FF0000", "33CCFF", "66FF66", "FF99CC", "FFFF00", "990066", "FF8000", "CCCCCC", "FF99CC"); // couleurs du graphique chaque cellule représente un résultat d'expé, dans l'ordre classique du script
     var param_resultat_negNulPos = new Array(0, -1, -1, 1, -1, 1, 1, 1, 1, -1, 1); // -1: resultat négatif ; 0: résultat neutre ; +1: résultat positif
-    var vaisseau_cout = new Array(new Array(2000, 2000, 0), new Array(6000, 6000, 0), new Array(3000, 1000, 0), new Array(6000, 4000, 0), new Array(20000, 7000, 2000), new Array(45000, 15000, 0), new Array(10000, 20000, 10000), new Array(10000, 6000, 2000), new Array(0, 1000, 0), new Array(50000, 25000, 15000), new Array(60000, 50000, 15000), new Array(5000000, 4000000, 1000000), new Array(30000, 40000, 15000)); // coûts de chaque vaisseau
+    var vaisseau_cout = new Array(
+        new Array(2000, 2000, 0),
+        new Array(6000, 6000, 0),
+        new Array(3000, 1000, 0),
+        new Array(6000, 4000, 0),
+        new Array(20000, 7000, 2000),
+        new Array(45000, 15000, 0),
+        new Array(10000, 20000, 10000),
+        new Array(10000, 6000, 2000),
+        new Array(0, 1000, 0),
+        new Array(50000, 25000, 15000),
+        new Array(60000, 50000, 15000),
+        new Array(5000000, 4000000, 1000000),
+        new Array(30000, 40000, 15000),
+        new Array(8000, 15000, 8000),
+        new Array(85000, 55000, 20000)); // coûts de chaque vaisseau
 
     var config = {
         header1_fontColor: "#FFFFFF",
@@ -1419,7 +1396,8 @@
     if (document.URL.match(/page=messages/)) {
         setTimeout(() => {
             const observerConfig = {attributes: true, childList: true, subtree: true};
-            /*const combatReportTabId = document.querySelector('li[data-tabid="21"]').getAttribute('aria-labelledby');
+
+            const combatReportTabId = document.querySelector('li[data-tabid="21"]').getAttribute('aria-labelledby');
             const combatReportTab = document.querySelector(`div[aria-labelledby="${combatReportTabId}"`)
             const combatReportObserver = new MutationObserver((mutationsList, observer) => {
                 for (let mutation of mutationsList) {
@@ -1428,7 +1406,7 @@
                     }
                 }
             });
-            combatReportObserver.observe(combatReportTab, observerConfig);*/
+            combatReportObserver.observe(combatReportTab, observerConfig);
 
             const expeditionTabId = document.querySelector('li[data-tabid="22"]').getAttribute('aria-labelledby');
             const expeditionTab = document.querySelector(`div[aria-labelledby="${expeditionTabId}"`)
