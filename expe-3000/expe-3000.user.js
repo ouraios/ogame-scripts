@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.0.1
+// @version    4.0.3
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -1434,7 +1434,7 @@
             const expeditionTab = document.querySelector(`div[aria-labelledby="${expeditionTabId}"`)
             const expeditionObserver = new MutationObserver((mutationsList, observer) => {
                 for (let mutation of mutationsList) {
-                    if (mutation.type === 'childList' && mutation.target.id === 'fleetsgenericpage') {
+                    if (mutation.type === 'childList' && mutation.target.classList.contains('ui-tabs-panel')) {
                         parcours_message(mutation.target, 'expedition');
                     }
                 }
