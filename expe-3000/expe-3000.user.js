@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.0.5
+// @version    4.0.6
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -80,7 +80,7 @@
 	"trouNoir" "destroys the entire expedition","the fleet is never heard from again"
 */
 (function () {
-    var version_courante = "4.0.5";
+    var version_courante = "4.0.6";
 
     // ************************
     // ****** Prototypes ******
@@ -1151,7 +1151,6 @@
             confirm_Install: "Voulez-vous installer le script ?\nATTENTION ! Cette opération effacera toutes les données d'expédition enregistrées !",
             confirm_Install_2: "Opération IRREVERSIBLE ! (au cas où :-))\nEn cas d'hésitation, cliquer 'annuler' et consulter la doc ou le forum",
             confirm_default: "Voulez-vous remettre les valeurs de configuration (pas les données des messages !), par défaut du script ?",
-            confirm_chgtVersion: "En cas de bugs, voulez-vous remettre les valeurs de config par défaut ?\nCela n'affectera pas les données!\n\n-- Conseillé si une MAJ a été faite\n\nAutrement, cliquez sur 'annuler'",
 
             boutonSpoiler_title: "Afficher/Masquer le bas de la table",
             boutonInstall_title: "(re-)initialiser le script (données + config)",
@@ -1371,7 +1370,7 @@
         if (localStorage.getObj(scriptKeyLocalStorage + "_premiereExecution") != false){
             initialiserDonneesUtilisateur();
         } else {
-            if (checkCurrentVersion && checkCurrentVersion != version_courante && confirm(texte.confirm_chgtVersion)) {
+            if (checkCurrentVersion && checkCurrentVersion != version_courante) {
                 patch();
                 localStorage.setObj(scriptKeyLocalStorage + "_versionCourante", version_courante);
             }
