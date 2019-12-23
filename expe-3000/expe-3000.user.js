@@ -980,6 +980,14 @@
                 if(messageTitle.includes('Rapport d`exploitation du champ de débris') && messageTitle.includes(':16]') && !list_harvest.includes(messageID)){
                     let rawResources = message.querySelector('.msg_content').textContent.match(/récolté ([\d\\.]+)\sunités de métal et ([\d\\.]+)\sunités de cristal/);
                     let resources = [parseInt(rawResources[1].replace('.', '')), parseInt(rawResources[2].replace('.', '')), 0];
+                    console.log('LOG EXPE 3000');
+                    console.log(rawResources);
+                    console.log(rawResources[1]);
+                    console.log(rawResources[2]);
+                    console.log(resources);
+                    console.log(compteur_v2.ress_gain);
+                    console.log(arrayAdditionTables(compteur_v2.ress_gain, resources));
+                    console.log('FIN LOG EXPE 3000');
                     compteur_v2.ress_gain = arrayAdditionTables(compteur_v2.ress_gain, resources);
                     compteur_v2.resultat[5]++;
                     list_harvest.push(messageID);
