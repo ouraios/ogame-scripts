@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.0.4
+// @version    4.0.5
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -80,7 +80,7 @@
 	"trouNoir" "destroys the entire expedition","the fleet is never heard from again"
 */
 (function () {
-    var version_courante = "3.16";
+    var version_courante = "4.0.5";
 
     // ************************
     // ****** Prototypes ******
@@ -643,6 +643,10 @@
         }
     }
 
+    function patch(){
+        localStorage.setObj(scriptKeyLocalStorage + "_list_harvest", new Array());
+    }
+
     // ***********************************
     // ****** Construction d'objets ******
     // ***********************************
@@ -967,6 +971,21 @@
                     affichage_alerte(texte.alerte_rcSimpleAjoute, message, "compteurExpe_alerteOK");
                 }
             }
+        } else if(messageType === 'harvest') {
+            let messages = messagesElementContainer.querySelectorAll('li.msg');
+            for(let i = 0; i < messages.length; i++){
+                let message = messages[i];
+                let messageID = message.dataset.msgId;
+                let messageTitle = message.querySelector('.msg_title').textContent;
+                if(messageTitle.includes('Rapport d`exploitation du champ de débris') && messageTitle.includes(':16]') && !list_harvest.includes(messageID)){
+                    let rawResources = message.querySelector('.msg_content').textContent.match(/récolté ([\d\\.]+)\sunités de métal et ([\d\\.]+)\sunités de cristal/);
+                    let resources = [parseInt(rawResources[1].replace('.', '')), parseInt(rawResources[2].replace('.', '')), 0];
+                    compteur_v2.ress_gain = arrayAdditionTables(compteur_v2.ress_gain, resources);
+                    compteur_v2.resultat[5]++;
+                    list_harvest.push(messageID);
+                    affichage_alerte(texte.alerte_rrAjoute, message, "compteurExpe_alerteOK");
+                }
+            }
         }
         savePeristentVariable();
     }
@@ -975,6 +994,7 @@
         localStorage.setObj(scriptKeyLocalStorage + "_liste_message_v2", liste_message_v2);
         localStorage.setObj(scriptKeyLocalStorage + "_compteur", compteur_v2);
         localStorage.setObj(scriptKeyLocalStorage + "_liste_message_RC", liste_message_RC);
+        localStorage.setObj(scriptKeyLocalStorage + "_list_harvest", list_harvest);
         localStorage.setObj(scriptKeyLocalStorage + "_dateInit", dateInit);
         localStorage.setObj(scriptKeyLocalStorage + "_liste_position", liste_position);
         localStorage.setObj(scriptKeyLocalStorage + "_issue_combat", issue_combat);
@@ -1028,6 +1048,7 @@
         localStorage.setObj(scriptKeyLocalStorage + "_dateInit", date2dateFormatOgame(new Date()));
         localStorage.setObj(scriptKeyLocalStorage + "_compteur", new compteurExpe(new Array()));
         localStorage.setObj(scriptKeyLocalStorage + "_liste_message_RC", new Array());
+        localStorage.setObj(scriptKeyLocalStorage + "_list_harvest", new Array());
         localStorage.setObj(scriptKeyLocalStorage + "_versionCourante", version_courante);
         localStorage.setObj(scriptKeyLocalStorage + "_liste_position", new Array());
         localStorage.setObj(scriptKeyLocalStorage + "_issue_combat", new Array(0, 0));
@@ -1118,6 +1139,7 @@
 
             alerte_rExpeAjoute: "Rapport d'expédition ajouté",
             alerte_rcSimpleAjoute: "RC ajouté",
+            alerte_rrAjoute: "RR ajouté à expe-3000",
             alerte_rcDetailleAjoute: "RC détaillé ajouté",
             alerte_nonSauve: "A sauvegarder",
             alerte_messageNonReconnu: "Message d'expédition non reconnu !",
@@ -1340,20 +1362,18 @@
     // ****** Script ******
     // ********************
 
+
     // test si 1ère exécution / MAJ <v2 / MAJ <  var version_courante / MAJ
     var ordonnerListePosition = false; // passera a true si il y a besoin d'ordonner la liste (au changement de version)
+    let checkCurrentVersion = localStorage.getObj(scriptKeyLocalStorage + "_versionCourante");
     if (location.href != "https://github.com/ouraios/ogame-scripts/raw/master/expe-3000/expe-3000.user.js") {
 
-        if (localStorage.getObj(scriptKeyLocalStorage + "_premiereExecution") != false) initialiserDonneesUtilisateur();
-        else {
-            if (typeof localStorage.getObj(scriptKeyLocalStorage + "_versionCourante") == "string") {
-                if ((localStorage.getObj(scriptKeyLocalStorage + "_versionCourante") != version_courante) && (confirm(texte.confirm_chgtVersion))) {
-                    default_config();
-                    ordonnerListePosition = true;
-                }
-            } else if (confirm(texte.confirm_chgtVersion)) {
-                default_config();
-                ordonnerListePosition = true;
+        if (localStorage.getObj(scriptKeyLocalStorage + "_premiereExecution") != false){
+            initialiserDonneesUtilisateur();
+        } else {
+            if (checkCurrentVersion && checkCurrentVersion != version_courante && confirm(texte.confirm_chgtVersion)) {
+                patch();
+                localStorage.setObj(scriptKeyLocalStorage + "_versionCourante", version_courante);
             }
         }
     }
@@ -1375,6 +1395,7 @@
     var compteur_v2 = localStorage.getObj(scriptKeyLocalStorage + "_compteur");
     var liste_message_RC = localStorage.getObj(scriptKeyLocalStorage + "_liste_message_RC");
     var liste_message_v2 = localStorage.getObj(scriptKeyLocalStorage + "_liste_message_v2");
+    var list_harvest = localStorage.getObj(scriptKeyLocalStorage + "_list_harvest");
     var dateInit = localStorage.getObj(scriptKeyLocalStorage + "_dateInit");
     var config_user = localStorage.getObj(scriptKeyLocalStorage + "_config_user");
     var liste_position = localStorage.getObj(scriptKeyLocalStorage + "_liste_position");
@@ -1418,6 +1439,19 @@
                 }
             });
             expeditionObserver.observe(expeditionTab, observerConfig);
+
+
+            const harvestTabId = document.querySelector('li[data-tabid="24"]').getAttribute('aria-labelledby');
+            const harvestTab = document.querySelector(`div[aria-labelledby="${harvestTabId}"`)
+            const harvestObserver = new MutationObserver((mutationsList, observer) => {
+                for (let mutation of mutationsList) {
+                    if (mutation.type === 'childList' && mutation.target.classList.contains('ui-tabs-panel')) {
+                        console.log('YES');
+                        parcours_message(mutation.target, 'harvest');
+                    }
+                }
+            });
+            harvestObserver.observe(harvestTab, observerConfig);
 
 
         }, 1000)
