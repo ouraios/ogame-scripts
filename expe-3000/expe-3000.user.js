@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.0.6
+// @version    4.0.7
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -280,7 +280,7 @@
             '#compteurExpe_titre .compteurExpe_bouton { background-color:' + config.header1_bgColor + '; }' +
             '#optionScript td { height:' + config.option_hauteurLigne + 'px ; }' +
             '</style>';
-        headDocument.innerHTML = inner + ajoutHTML;
+        headDocument.insertAdjacentHTML( 'beforeend', ajoutHTML);
     }
 
     function creer_partieFixeTableaux(numTableau) { // Construction de la partie fixe tableaux affichés (les titres)
@@ -351,7 +351,7 @@
             '<tr><td class="compteurExpe_dateInit" width="' + (100 - config.console_width) + '%">' + texte.titre_h1_sousTitre + dateInit + '</td>' +
             '<td id="compteurExpe_console" style="background-color:' + config.console_bgColor + '" class="compteurExpe_console" width="' + config.console_width + '%">' + texte.console_base + '</td>' +
             '</tr></table></td></tr></table></div><div id="espace_contenuSpoiler"></div></div>';
-        elHTML.innerHTML = inner + ajoutHTML;
+        elHTML.insertAdjacentHTML( 'beforeend', ajoutHTML);
         (config_user.spoilerDefault) ? afficherTable_secondaire() : ecouteBouton_option();
     }
 
