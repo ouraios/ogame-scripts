@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.0.7
+// @version    4.1.0
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -249,7 +249,10 @@
         elHTML.innerHTML = inner + ajoutHTML;
 
         messageElement.querySelector("#boutonValider_trouNoir").addEventListener("click", function () {
-            for (var tmp = 0; tmp < compteur_v2.vaiss_perte.length; tmp++) compteur_v2.vaiss_perte[tmp] += parseInt(messageElement.querySelector("#trouNoir_vaiss" + tmp).value);
+            for (var tmp = 0; tmp < compteur_v2.vaiss_perte.length; tmp++){
+                compteur_v2.vaiss_perte[tmp] += parseInt(messageElement.querySelector("#trouNoir_vaiss" + tmp).value);
+            }
+            savePeristentVariable(true);
             effacerContenu("trouNoirParam");
             affichage_alerte(texte.alerte_trouNoirParam, messageElement, "compteurExpe_alerteOK");
         }, false);
@@ -327,7 +330,7 @@
         compteur_v22tableaux(0);
         var elHTML = document.getElementById("middle");
         var inner = elHTML.innerHTML;
-        var ajoutHTML = '<div id="compteur-expe-dashboard"><div align="center"><table class="compteurExpe_table1">' +
+        var ajoutHTML = '<div id="compteur-expe-dashboard"><div id="add-lost-fleet-form" style="display:none;"></div><div align="center"><table class="compteurExpe_table1">' +
             '<tr><td valign="top" class="compteurExpe_tdPadding">' +
             '<table width="100%"><tr><td>' +
             ecrireTableau(creer_partieFixeTableaux(1), compteur_v2.rapport_resultat, new Array(11, -1)) +
@@ -337,12 +340,17 @@
             '</td></tr><tr><td class="compteurExpe_tdPadding">' +
             ecrireTableau(creer_partieFixeTableaux(4), compteur_v2.rapport_points, new Array(2, -1)) +
             '</td></tr></table></td></tr></table></td></tr>' +
-            '<tr><td id="compteurExpe_titre" class="compteurExpe_tdPadding"><table class="compteurExpe_table2"><tr><td colspan=2><table><tr><td id="boutonSpoiler" class="compteurExpe_bouton" valign="middle">'+
-            `<svg title="${texte.boutonSpoiler_title}" style="height: 20px;width: 20px;cursor: pointer;" aria-hidden="true" focusable="false" data-prefix="fad" data-icon="sort-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="svg-inline--fa fa-sort-down fa-w-10 fa-7x"><g class="fa-group"><path fill="currentColor" d="M279.07 224.05h-238c-21.4 0-32.1-25.9-17-41l119-119a23.9 23.9 0 0 1 33.8-.1l.1.1 119.1 119c15.07 15.05 4.4 41-17 41z" class="fa-secondary" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path><path fill="currentColor" d="M296.07 329.05L177 448.05a23.9 23.9 0 0 1-33.8.1l-.1-.1-119-119c-15.1-15.1-4.4-41 17-41h238c21.37 0 32.04 25.95 16.97 41z" class="fa-primary" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></g></svg>` + '</td>' +
+            '<tr><td id="compteurExpe_titre" class="compteurExpe_tdPadding"><table class="compteurExpe_table2"><tr><td colspan=2><table><tr><td id="boutonSpoiler" title="'+texte.boutonSpoiler_title+'" class="compteurExpe_bouton" valign="middle">'+
+            `<svg style="height: 20px;width: 20px;cursor: pointer;" aria-hidden="true" focusable="false" data-prefix="fad" data-icon="sort-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="svg-inline--fa fa-sort-down fa-w-10 fa-7x"><g class="fa-group"><path fill="currentColor" d="M279.07 224.05h-238c-21.4 0-32.1-25.9-17-41l119-119a23.9 23.9 0 0 1 33.8-.1l.1.1 119.1 119c15.07 15.05 4.4 41-17 41z" class="fa-secondary" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path><path fill="currentColor" d="M296.07 329.05L177 448.05a23.9 23.9 0 0 1-33.8.1l-.1-.1-119-119c-15.1-15.1-4.4-41 17-41h238c21.37 0 32.04 25.95 16.97 41z" class="fa-primary" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path></g></svg>` + '</td>' +
+            `<td id="addLostFleetBtn" title="Ajouter flotte perdue" class="compteurExpe_bouton" valign="middle">
+                <svg style="height: 20px;width: 20px;cursor: pointer;" aria-hidden="true" focusable="false" data-prefix="far" data-icon="thunderstorm" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-thunderstorm fa-w-16 fa-9x">
+                    <path fill="currentColor" d="M337 288h-72.1l22.6-77.1c2.5-9.5-4.6-18.9-14.5-18.9h-82c-7.5 0-13.9 5.6-14.9 13l-16 130c-1.2 9 5.8 17 14.9 17h81l-31.6 141.5c-2.2 9.5 5 18.5 14.6 18.5 5.2 0 10.2-2.7 13-7.5l98-194c5.7-10-1.5-22.5-13-22.5zm73.7-183.8C397.2 61.8 358 32 312 32c-13.5 0-26.8 2.6-39.2 7.7C250.3 14.5 218.4 0 184 0 120 0 67.6 50.3 64.2 113.4 25.6 130.4 0 168.5 0 212c0 59.5 48.4 108 108 108h21.7l5.9-48H108c-33.1 0-60-26.9-60-60 0-28 19.1-52 46.4-58.3l20.8-4.8-2.8-24.9c-.2-1.3-.4-2.6-.4-4 0-39.7 32.3-72 72-72 25.2 0 48.2 13.1 61.4 35.1l13.3 22.1 21.1-14.9C289.4 83.6 300.5 80 312 80c28.6 0 52.4 21.7 55.3 50.4l2.2 21.6H404c33.1 0 60 26.9 60 60s-26.9 60-60 60h-32.1c2.1 2.4 4.2 4.7 5.8 7.5 7.2 12.4 7.8 27.3 2.7 40.5H404c59.6 0 108-48.5 108-108 0-57.3-44.9-104.3-101.3-107.8z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;"></path>
+                </svg>
+            </td>`+
             '<td class="compteurExpe_header1" width="' + (recuperer_CSSOgame_width() - 2 * config.bouton_width - 100) + 'px">' + texte.titre_h1_rapport + '<td class="compteurExpe_dateInit" width="100px">' + texte.version + ' ' + version_courante + '</td></td>' +
-            '<td id="boutonOption" class="compteurExpe_bouton" valign="middle">'+
+            '<td id="boutonOption" title="'+texte.boutonOption_title+'" class="compteurExpe_bouton" valign="middle">'+
             `
-            <svg style="height: 20px;width: 20px;cursor: pointer;" title="${texte.boutonOption_title}" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="tools" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-tools fa-w-16 fa-3x">
+            <svg style="height: 20px;width: 20px;cursor: pointer;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="tools" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-tools fa-w-16 fa-3x">
                 <path fill="currentColor" d="M501.1 395.7L384 278.6c-23.1-23.1-57.6-27.6-85.4-13.9L192 158.1V96L64 0 0 64l96 128h62.1l106.6 106.6c-13.6 27.8-9.2 62.3 13.9 85.4l117.1 117.1c14.6 14.6 38.2 14.6 52.7 0l52.7-52.7c14.5-14.6 14.5-38.2 0-52.7zM331.7 225c28.3 0 54.9 11 74.9 31l19.4 19.4c15.8-6.9 30.8-16.5 43.8-29.5 37.1-37.1 49.7-89.3 37.9-136.7-2.2-9-13.5-12.1-20.1-5.5l-74.4 74.4-67.9-11.3L334 98.9l74.4-74.4c6.6-6.6 3.4-17.9-5.7-20.2-47.4-11.7-99.6.9-136.6 37.9-28.5 28.5-41.9 66.1-41.2 103.6l82.1 82.1c8.1-1.9 16.5-2.9 24.7-2.9zm-103.9 82l-56.7-56.7L18.7 402.8c-25 25-25 65.5 0 90.5s65.5 25 90.5 0l123.6-123.6c-7.6-19.9-9.9-41.6-5-62.7zM64 472c-13.2 0-24-10.8-24-24 0-13.3 10.7-24 24-24s24 10.7 24 24c0 13.2-10.7 24-24 24z" class="" data-darkreader-inline-fill="" style="--darkreader-inline-fill:currentColor;">                
                 </path>
             </svg>
@@ -352,6 +360,7 @@
             '<td id="compteurExpe_console" style="background-color:' + config.console_bgColor + '" class="compteurExpe_console" width="' + config.console_width + '%">' + texte.console_base + '</td>' +
             '</tr></table></td></tr></table></div><div id="espace_contenuSpoiler"></div></div>';
         elHTML.insertAdjacentHTML( 'beforeend', ajoutHTML);
+        afficher_formRExp(document.querySelector('#add-lost-fleet-form'));
         (config_user.spoilerDefault) ? afficherTable_secondaire() : ecouteBouton_option();
     }
 
@@ -507,6 +516,10 @@
         document.getElementById("boutonSpoiler").addEventListener("click", function () {
             (document.getElementById("contenuSpoiler")) ? effacerContenu("contenuSpoiler") : afficherTable_secondaire();
         }, false);
+        document.querySelector('#compteur-expe-dashboard #addLostFleetBtn').addEventListener('click', () => {
+            let formAddLostFleet = document.querySelector('#add-lost-fleet-form');
+            formAddLostFleet.style.display = formAddLostFleet.style.display == 'none' ? 'initial' : 'none';
+        });
         document.getElementById("boutonOption").addEventListener("click", function () {
             (document.getElementById("optionScript")) ? effacerContenu("optionScript") : afficherOption();
         }, false);
@@ -644,7 +657,7 @@
     }
 
     function patch(){
-        localStorage.setObj(scriptKeyLocalStorage + "_list_harvest", new Array());
+        console.log('Nothing to patch today !');
     }
 
     // ***********************************
@@ -990,7 +1003,11 @@
         savePeristentVariable();
     }
 
-    function savePeristentVariable(){
+    function savePeristentVariable(compteurOnly = false){
+        if(compteurOnly){
+            localStorage.setObj(scriptKeyLocalStorage + "_compteur", compteur_v2);
+            return;
+        }
         localStorage.setObj(scriptKeyLocalStorage + "_liste_message_v2", liste_message_v2);
         localStorage.setObj(scriptKeyLocalStorage + "_compteur", compteur_v2);
         localStorage.setObj(scriptKeyLocalStorage + "_liste_message_RC", liste_message_RC);
@@ -1097,7 +1114,7 @@
         var param_resultat = new Array( // phrases des messages d'expéditions ; la première case de chaque type de résultat est réservée à la nomination du résultat ;  la 2ème à la nomination telle qu'elle sera affichée" ; la 3ème à la couleur d'affichage dans le graphique
             new Array("aucun", "Aucun", "votre flotte fera demi-tour", "sans résultat aucun", "l`expédition a dû être interrompue", "ne ramène rien de spécial", "a découvert... le vide", "C`est d`ailleurs la seule info recueillie", "aucune information vraiment passionnante", "aucun résultat intéressant", "plusieurs musées de la planète-mère", "revient les mains et les soutes vides", "Peut-être saurons nous", "revient donc sans aucun résultat", "ne nous a pas apporté grand chose", "a contracté une espèce de paludisme qui a envoyé une bonne partie de l`équipage à l`infirmerie"),
             new Array("pirates", "Pirates", "pirates", "Des barbares primitifs"),
-            new Array("aliens", "Aliens", "espèce inconnue", "petit groupe de vaisseaux inconnus", "sans avertissement et sans raison", "les agresseurs n'ont pas pu être identifiés", "les agresseurs n`ont pas pu être identifiés", "vaisseaux cristallins va entrer en collision", "faisons feu"),
+            new Array("aliens", "Aliens", "flotte d`invasion alien", "espèce inconnue", "petit groupe de vaisseaux inconnus", "sans avertissement et sans raison", "les agresseurs n'ont pas pu être identifiés", "les agresseurs n`ont pas pu être identifiés", "vaisseaux cristallins va entrer en collision", "faisons feu"),
             new Array("avance", "Avance", "avec un peu d`avance", "pour accélérer son retour"),
             new Array("retard", "Retard", "retard", "plus longtemps qu`initialement prévu", "fallu plus de temps"),
             new Array("ress_gain", "Ressources", "L`attaquant obtient Métal", "L`attaquant obtient Cristal", "L`attaquant obtient Deutérium"),
@@ -1146,7 +1163,7 @@
             alerte_messSondeNonReconnu: "Rapport communication non reconnu !",
             alerte_rcDetailleInutile: "Aucune perte alliée: Détails inutiles",
             alerte_posEpuisee: "Position épuisée !",
-            alerte_trouNoirParam: "Trou noir paramétré !",
+            alerte_trouNoirParam: "Flotte perdue enregistrée !",
 
             confirm_Install: "Voulez-vous installer le script ?\nATTENTION ! Cette opération effacera toutes les données d'expédition enregistrées !",
             confirm_Install_2: "Opération IRREVERSIBLE ! (au cas où :-))\nEn cas d'hésitation, cliquer 'annuler' et consulter la doc ou le forum",
@@ -1202,7 +1219,7 @@
             option_BBCode_perso_place_bas: "Bas",
             option_BBCode_perso_place_mas: "Masquer",
 
-            trouNoir: "Trou noir !! :(<br><br>Connaissez-vous la composition exacte de la flotte perdue ?<br>Si oui, veuillez la saisir<br>on, laissez vide et validez, ou bien quittez:",
+            trouNoir: "Connaissez-vous la composition exacte de la flotte perdue ?<br>Si oui, veuillez la saisir<br>on, laissez vide et validez, ou bien quittez:",
 
             liste_position_expedition: "expédition",
             liste_position_nonRep: "non listée",
@@ -1353,7 +1370,7 @@
         boutonMAJ_url: "http://img266.imageshack.us/img266/3448/boutonmaj.png",
         boutonBBCode_url: "http://imageshack.us/a/img821/7079/boutonbbcode.png",
         boutonUserScripts_lien: "http://userscripts.org/scripts/show/150500",
-        boutonForum_lien: "http://board.ogame.fr/board1474-ogame-le-jeu/board641-les-cr-ations-ogamiennes/board642-logiciels-tableurs/1061937-exp-3000-compteur-d-exp-dition-autonome/",
+        boutonForum_lien: "https://board.fr.ogame.gameforge.com/index.php?thread/675592-exp%C3%A9-3000-compteur-d-exp%C3%A9dition-autonome/",
         boutonMAJ_lien: "https://github.com/ouraios/ogame-scripts/raw/master/expe-3000/expe-3000.user.js",
         bouton_width: 27,
     };
