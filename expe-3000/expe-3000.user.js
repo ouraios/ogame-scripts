@@ -314,7 +314,7 @@
         // Tableau 'Points'
         if (numTableau == 4) var fixe = new Array(3, 5, texte.titre_h2_points, new Array(texte.titre_h3_points_domaine, texte.titre_h3_points_points, texte.titre_h3_points_pourct), new Array(texte.titre_hLigne_points_ressources, texte.titre_hLigne_points_flotte, texte.titre_hLigne_points_total));
         // Tableau 'Items'
-        if (numTableau == 5) var fixe = new Array(5, 8, texte.titre_h2_item, new Array(texte.titre_h3_item_nom, item_niv_texte[0], item_niv_texte[1], item_niv_texte[2], texte.titre_h3_item_gain), item_nom_texte);
+        if (numTableau == 5) var fixe = new Array(5, 8, texte.titre_h2_item, new Array(texte.titre_h3_item_nom, item_niv_texte[0], item_niv_texte[1], item_niv_texte[2], item_niv_texte[3], texte.titre_h3_item_gain), item_nom_texte);
         // Tableau 'Autres stats'
         if (numTableau == 6) var fixe = new Array(3, 7, texte.titre_h2_divers, new Array(texte.titre_h3_divers_nom, texte.titre_h3_divers_nombre, texte.titre_h3_divers_pourct), new Array(texte.titre_hLigne_divers_resNeg, texte.titre_hLigne_divers_resNul, texte.titre_hLigne_divers_resPos, texte.titre_hLigne_divers_ptExp, texte.titre_hLigne_divers_zoneEpuisee));
         return fixe;
@@ -425,7 +425,7 @@
     }
 
     function creer_graphique_img() {
-        var codeGraph = 'http://chart.apis.google.com/chart?cht=p&chf=bg,s,efefef00&chs=' + config.graph_img_w + 'x' + config.graph_img_h + '&chld=M&&chtt=' + texte.graphGoogle_titre + ' (' + compteur_v2.rapport_resultat[0][compteur_v2.rapport_resultat[0].length - 1] + ')&chl=';
+        var codeGraph = 'https://chart.apis.google.com/chart?cht=p&chf=bg,s,efefef00&chs=' + config.graph_img_w + 'x' + config.graph_img_h + '&chld=M&&chtt=' + texte.graphGoogle_titre + ' (' + compteur_v2.rapport_resultat[0][compteur_v2.rapport_resultat[0].length - 1] + ')&chl=';
         // Paramètres du graphique
         var ajoutHTML_2_1 = ""; // Légende
         var ajoutHTML_2_2 = ""; // Couleurs
@@ -1133,9 +1133,9 @@
         );
 
         var item_nom = new Array("Booster de métal", "Booster de cristal", "Booster de deutérium", "DETROID", "KRAKEN", "NEWTRON");
-        var item_niv = new Array("bronze", "argent", "or");
+        var item_niv = new Array("bronze", "argent", "or", "platine");
         var item_nom_texte = new Array("Booster de métal", "Booster de cristal", "Booster de deutérium", "Detroïd", "Kraken", "Newtron");
-        var item_niv_texte = new Array("Bronze", "Argent", "Or");
+        var item_niv_texte = new Array("Bronze", "Argent", "Or", "Platine");
 
         var texte = {
             script: "CompteurExpe",
