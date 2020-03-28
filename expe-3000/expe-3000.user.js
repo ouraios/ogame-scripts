@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Expe-3000
 // @namespace  ulamfiolv357yhh7
-// @version    4.1.0
+// @version    4.1.1
 // @description  Compte les expéditions
 // @include https://*.ogame.gameforge.com/game/index.php?page=messages*
 // @include https://*.ogame.gameforge.com/game/index.php?page=ingame&component=overview
@@ -314,7 +314,7 @@
         // Tableau 'Points'
         if (numTableau == 4) var fixe = new Array(3, 5, texte.titre_h2_points, new Array(texte.titre_h3_points_domaine, texte.titre_h3_points_points, texte.titre_h3_points_pourct), new Array(texte.titre_hLigne_points_ressources, texte.titre_hLigne_points_flotte, texte.titre_hLigne_points_total));
         // Tableau 'Items'
-        if (numTableau == 5) var fixe = new Array(5, 8, texte.titre_h2_item, new Array(texte.titre_h3_item_nom, item_niv_texte[0], item_niv_texte[1], item_niv_texte[2], item_niv_texte[3], texte.titre_h3_item_gain), item_nom_texte);
+        if (numTableau == 5) var fixe = new Array(5, 8, texte.titre_h2_item, new Array(texte.titre_h3_item_nom, item_niv_texte[0], item_niv_texte[1], item_niv_texte[2], texte.titre_h3_item_gain), item_nom_texte);
         // Tableau 'Autres stats'
         if (numTableau == 6) var fixe = new Array(3, 7, texte.titre_h2_divers, new Array(texte.titre_h3_divers_nom, texte.titre_h3_divers_nombre, texte.titre_h3_divers_pourct), new Array(texte.titre_hLigne_divers_resNeg, texte.titre_hLigne_divers_resNul, texte.titre_hLigne_divers_resPos, texte.titre_hLigne_divers_ptExp, texte.titre_hLigne_divers_zoneEpuisee));
         return fixe;
