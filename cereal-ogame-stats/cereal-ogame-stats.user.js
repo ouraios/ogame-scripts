@@ -5,8 +5,9 @@
 // @downloadURL  https://github.com/ouraios/ogame-scripts/raw/master/cereal-ogame-stats/cereal-ogame-stats.user.js
 // @updateURL    https://github.com/ouraios/ogame-scripts/raw/master/cereal-ogame-stats/cereal-ogame-stats.user.js
 // @icon         https://github.com/ouraios/ogame-scripts/raw/master/cereal-ogame-stats/icon.png
-// @version      3.1.4
+// @version      4.0.1
 // @include      https://*.ogame.gameforge.com/game/index.php?page=alliance*
+// @include      https://*.ogame.gameforge.com/game/index.php?page=ingame&component=alliance
 // @author       Elías Grande and Ouraios
 // ==/UserScript==
 /*! CerealOgameStats (C) 2016 Elías Grande Cásedas | MIT | opensource.org/licenses/MIT */
@@ -2670,7 +2671,7 @@
             if (doc.getElementById('allyInternText'))
             {
                 delete this.dom;
-                this.dom = new Section(doc.getElementById('eins'));
+                this.dom = new Section(doc.querySelector('div.allianceContent'));
             }
             else
             {
