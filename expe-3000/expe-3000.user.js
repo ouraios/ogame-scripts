@@ -1112,11 +1112,11 @@
         );
 
         var param_resultat = new Array( // phrases des messages d'expéditions ; la première case de chaque type de résultat est réservée à la nomination du résultat ;  la 2ème à la nomination telle qu'elle sera affichée" ; la 3ème à la couleur d'affichage dans le graphique
-            new Array("aucun", "Aucun", "votre flotte fera demi-tour", "sans résultat aucun", "l`expédition a dû être interrompue", "ne ramène rien de spécial", "a découvert... le vide", "C`est d`ailleurs la seule info recueillie", "aucune information vraiment passionnante", "aucun résultat intéressant", "plusieurs musées de la planète-mère", "revient les mains et les soutes vides", "Peut-être saurons nous", "revient donc sans aucun résultat", "ne nous a pas apporté grand chose", "a contracté une espèce de paludisme qui a envoyé une bonne partie de l`équipage à l`infirmerie"),
+            new Array("aucun", "Aucun", "sans résultat aucun", "l`expédition a dû être interrompue", "ne ramène rien de spécial", "a découvert... le vide", "C`est d`ailleurs la seule info recueillie", "aucune information vraiment passionnante", "aucun résultat intéressant", "plusieurs musées de la planète-mère", "revient les mains et les soutes vides", "Peut-être saurons nous", "revient donc sans aucun résultat", "ne nous a pas apporté grand chose", "a contracté une espèce de paludisme qui a envoyé une bonne partie de l`équipage à l`infirmerie"),
             new Array("pirates", "Pirates", "pirates", "Des barbares primitifs"),
             new Array("aliens", "Aliens", "flotte d`invasion alien", "espèce inconnue", "petit groupe de vaisseaux inconnus", "sans avertissement et sans raison", "les agresseurs n'ont pas pu être identifiés", "les agresseurs n`ont pas pu être identifiés", "vaisseaux cristallins va entrer en collision", "faisons feu"),
             new Array("avance", "Avance", "avec un peu d`avance", "pour accélérer son retour"),
-            new Array("retard", "Retard", "retard", "plus longtemps qu`initialement prévu", "fallu plus de temps"),
+            new Array("retard", "Retard", "retard", "votre flotte fera demi-tour", "plus longtemps qu`initialement prévu", "fallu plus de temps"),
             new Array("ress_gain", "Ressources", "L`attaquant obtient Métal", "L`attaquant obtient Cristal", "L`attaquant obtient Deutérium"),
             new Array("vaiss_gain", "Flotte trouvée", "Votre flotte s`est agrandie", "si nous pouvons sauver quelques vaisseaux", "découvert une forteresse stellaire"),
             new Array("marchand", "Marchand", "chargé de ressources à échanger", "liste de clients privilégiés"),
